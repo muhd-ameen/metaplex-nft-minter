@@ -4,17 +4,24 @@ import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import MintForm from "./components/MintForm";
+import MyNFTs from "./components/MyNFTs";
+import RecentMints from "./components/RecentMints";
+
+const SOLANA_NETWORK =
+  (typeof process !== "undefined" &&
+    process.env.NEXT_PUBLIC_SOLANA_NETWORK) ||
+  "devnet";
+const NETWORK_LABEL =
+  SOLANA_NETWORK === "mainnet-beta" ? "Mainnet" : "Devnet";
 
 /**
  * Home Page
- * Main page with wallet connection and NFT minting form.
- * Clean, centered card layout on a dark gradient background.
+ * Wallet connection, My NFTs gallery, mint form, recent mints.
  */
 export default function Home() {
   const { publicKey, connected } = useWallet();
   const [mounted, setMounted] = useState(false);
 
-  // Avoid WalletNotReadyError: only render wallet UI after client mount
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -27,7 +34,7 @@ export default function Home() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4">
             <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
             <span className="text-xs text-purple-300 font-medium">
-              Solana Devnet
+              Solana {NETWORK_LABEL}
             </span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">
@@ -74,9 +81,13 @@ export default function Home() {
             )}
           </div>
 
-          {/* Mint Form */}
+          {/* My NFTs + Mint Form */}
           {connected ? (
-            <MintForm />
+            <>
+              <MyNFTs />
+              <MintForm />
+              <RecentMints />
+            </>
           ) : (
             <div className="text-center py-12">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-zinc-800 mb-4">
@@ -103,7 +114,7 @@ export default function Home() {
 
         {/* ── Footer ── */}
         <p className="text-center text-xs text-zinc-600 mt-6">
-          Powered by Metaplex &middot; Solana Devnet
+          Powered by Metaplex &middot; Solana {NETWORK_LABEL}
         </p>
       </div>
     </main>
