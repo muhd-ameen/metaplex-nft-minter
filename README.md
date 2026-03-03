@@ -16,7 +16,23 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment (.env.local)
+
+- `PINATA_JWT` – required for IPFS uploads
+- `NEXT_PUBLIC_RPC_URL` – optional; defaults to Solana Devnet
+- `NEXT_PUBLIC_SOLANA_NETWORK` – optional; `devnet` (default) or `mainnet-beta` for explorer links and network label
+- `NEXT_PUBLIC_PINATA_GATEWAY` – optional; IPFS gateway URL
+
+### Features
+
+- **Mint NFT** – Upload image, set name, description, royalty %, and optional attributes; mint on Solana via Metaplex
+- **Image validation** – Max 5 MB, PNG/JPG/GIF/WEBP
+- **My NFTs** – View NFTs owned by the connected wallet; **Transfer** to another address
+- **Recent mints** – Last 10 mints (stored in localStorage) with explorer links
+- **Copy** – Copy transaction signature and mint address after minting
+- **Network indicator** – Shows Devnet or Mainnet based on env
+
+You can start editing the page by modifying `app/page.tsx`.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
