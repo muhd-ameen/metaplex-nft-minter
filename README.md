@@ -25,7 +25,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Features
 
-- **Mint NFT** – Upload image, set name, description, royalty %, and optional attributes; mint on Solana via Metaplex
+- **Mint NFT** – Upload image, set name, description, and optional attributes; mint on Solana via Metaplex
 - **Image validation** – Max 5 MB, PNG/JPG/GIF/WEBP
 - **My NFTs** – View NFTs owned by the connected wallet; **Transfer** to another address
 - **Recent mints** – Last 10 mints (stored in localStorage) with explorer links

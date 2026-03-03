@@ -4,7 +4,7 @@ import React, { useState, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useUmi } from "./UmiProvider";
 import { createNft } from "@metaplex-foundation/mpl-token-metadata";
-import { generateSigner, percentAmount } from "@metaplex-foundation/umi";
+import { generateSigner } from "@metaplex-foundation/umi";
 import { base58 } from "@metaplex-foundation/umi/serializers";
 import {
   addRecentMint,
@@ -39,7 +39,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 
 /**
  * MintForm
- * Handles the entire NFT minting flow with validation, royalty, attributes,
+ * Handles the entire NFT minting flow with validation, attributes,
  * and success state (mint address, copy, recent mints).
  */
 export default function MintForm() {
@@ -52,7 +52,6 @@ export default function MintForm() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
 
-  const [royaltyPercent, setRoyaltyPercent] = useState(5);
   const [attributes, setAttributes] = useState<AttributeRow[]>([
     { trait_type: "", value: "" },
   ]);
@@ -159,9 +158,7 @@ export default function MintForm() {
         mint,
         name: name.trim(),
         uri: metadataUri,
-        sellerFeeBasisPoints: percentAmount(
-          Math.min(100, Math.max(0, royaltyPercent))
-        ),
+        sellerFeeBasisPoints: 0,
       }).sendAndConfirm(umi);
 
       const signature = base58.deserialize(tx.signature)[0];
@@ -193,7 +190,6 @@ export default function MintForm() {
     imageFile,
     name,
     description,
-    royaltyPercent,
     attributes,
     imageError,
     umi,
@@ -304,29 +300,6 @@ export default function MintForm() {
           className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-xl 
                      text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 
                      focus:ring-1 focus:ring-purple-500 transition-all resize-none"
-        />
-      </div>
-
-      {/* ── Royalty % ── */}
-      <div className="mb-4">
-        <label
-          htmlFor="royalty"
-          className="block text-sm font-medium text-zinc-300 mb-2"
-        >
-          Royalty (%)
-        </label>
-        <input
-          id="royalty"
-          type="number"
-          min={0}
-          max={100}
-          value={royaltyPercent}
-          onChange={(e) =>
-            setRoyaltyPercent(Math.min(100, Math.max(0, Number(e.target.value) || 0)))
-          }
-          className="w-full px-4 py-3 bg-zinc-800/50 border border-zinc-700 rounded-xl 
-                     text-white focus:outline-none focus:border-purple-500 
-                     focus:ring-1 focus:ring-purple-500 transition-all"
         />
       </div>
 
