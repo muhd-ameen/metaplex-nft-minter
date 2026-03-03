@@ -1,53 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Metaplex NFT Minter
 
-## Getting Started
+Mint, view, and transfer NFTs on Solana (Devnet/Mainnet) using Metaplex. Connect a wallet, upload an image and metadata to IPFS, and mint on-chain in one flow.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Tech Stack
+
+| Layer | Tech |
+|-------|------|
+| **Framework** | [Next.js](https://nextjs.org) 16 (App Router), React 19 |
+| **Styling** | Tailwind CSS 4 |
+| **Chain** | [Solana](https://solana.com) (`@solana/web3.js`, `@solana/spl-token`) |
+| **Wallet** | [Solana Wallet Adapter](https://github.com/anza-xyz/wallet-adapter) (Phantom), `@solana/wallet-adapter-react` + `-react-ui` |
+| **NFT / Metadata** | [Metaplex Umi](https://github.com/Metaplex-foundation/umi) + [mpl-token-metadata](https://github.com/Metaplex-foundation/mpl-token-metadata) |
+| **Storage** | [Pinata](https://pinata.cloud) (IPFS) for images and metadata JSON |
+
+### Providers (app layout)
+
+- **WalletProvider** – `ConnectionProvider` → `WalletProvider` (Phantom) → `WalletModalProvider` for connect/disconnect and RPC endpoint.
+- **UmiProvider** – Umi instance with `mplTokenMetadata` and `walletAdapterIdentity` for signing; used for minting and fetching NFTs.
+
+### Main dependencies
+
+```
+@metaplex-foundation/mpl-token-metadata  # createNft, fetchAllDigitalAssetByOwner
+@metaplex-foundation/umi                 # Umi framework
+@metaplex-foundation/umi-bundle-defaults
+@metaplex-foundation/umi-signer-wallet-adapters
+@solana/wallet-adapter-react
+@solana/wallet-adapter-react-ui
+@solana/wallet-adapter-wallets           # PhantomWalletAdapter
+@solana/spl-token                       # NFT transfer
+@solana/web3.js
+next, react, react-dom
+tailwindcss
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-### Environment (.env.local)
+## Features
 
-- `PINATA_JWT` – required for IPFS uploads
-- `NEXT_PUBLIC_RPC_URL` – optional; defaults to Solana Devnet
-- `NEXT_PUBLIC_SOLANA_NETWORK` – optional; `devnet` (default) or `mainnet-beta` for explorer links and network label
-- `NEXT_PUBLIC_PINATA_GATEWAY` – optional; IPFS gateway URL
+- **Mint NFT** – Upload image (PNG/JPG/GIF/WEBP, max 5 MB), name, description, optional attributes → upload to IPFS (Pinata) → mint on Solana via Metaplex.
+- **My NFTs** – List NFTs owned by the connected wallet (Metaplex); optional **Transfer** to another address (SPL token transfer).
+- **Recent mints** – Last 10 mints in localStorage with “View tx” links.
+- **Copy** – Copy transaction signature and mint address after minting.
+- **Network** – Badge and explorer links use Devnet or Mainnet from env.
 
-### Features
+---
 
-- **Mint NFT** – Upload image, set name, description, and optional attributes; mint on Solana via Metaplex
-- **Image validation** – Max 5 MB, PNG/JPG/GIF/WEBP
-- **My NFTs** – View NFTs owned by the connected wallet; **Transfer** to another address
-- **Recent mints** – Last 10 mints (stored in localStorage) with explorer links
-- **Copy** – Copy transaction signature and mint address after minting
-- **Network indicator** – Shows Devnet or Mainnet based on env
+## Environment (.env.local)
 
-You can start editing the page by modifying `app/page.tsx`.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `PINATA_JWT` | Yes | Pinata API JWT for IPFS uploads. |
+| `NEXT_PUBLIC_RPC_URL` | No | Solana RPC URL (default: Devnet). |
+| `NEXT_PUBLIC_SOLANA_NETWORK` | No | `devnet` or `mainnet-beta` for explorer links and label. |
+| `NEXT_PUBLIC_PINATA_GATEWAY` | No | IPFS gateway base URL for metadata/image URIs. |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Getting started
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+git clone <repo-url>
+cd solana-nft
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Add `.env.local` with at least `PINATA_JWT`, then:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run dev    # http://localhost:3000
+npm run build
+npm start
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project structure (relevant parts)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# metaplex-nft-minter
+```
+app/
+  layout.tsx           # WalletProvider → UmiProvider → children
+  page.tsx             # Header, wallet section, MyNFTs, MintForm, RecentMints
+  components/
+    WalletProvider.tsx # Solana connection + Phantom + modal
+    UmiProvider.tsx    # Umi + mplTokenMetadata + wallet signer
+    MintForm.tsx       # Image upload, metadata, IPFS → mint
+    MyNFTs.tsx         # Fetch owned NFTs, transfer modal
+    RecentMints.tsx    # localStorage recent mints list
+  api/upload/route.ts  # POST: image + metadata → Pinata → metadata URI
+  lib/constants.ts     # Recent mints key, image limits, helpers
+```
