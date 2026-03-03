@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
         const file = formData.get("file") as File | null;
         const name = formData.get("name") as string | null;
         const description = formData.get("description") as string | null;
+        const attributesRaw = formData.get("attributes") as string | null;
 
         // Validate required fields
         if (!file || !name || !description) {
@@ -71,6 +72,25 @@ export async function POST(request: NextRequest) {
         const imageCid = imageData.IpfsHash;
         const imageUrl = `${gateway}/ipfs/${imageCid}`;
 
+        // Parse optional attributes (array of { trait_type, value })
+        let attributes: { trait_type: string; value: string }[] = [];
+        if (attributesRaw && attributesRaw.trim()) {
+            try {
+                const parsed = JSON.parse(attributesRaw) as unknown;
+                if (Array.isArray(parsed)) {
+                    attributes = parsed.filter(
+                        (a): a is { trait_type: string; value: string } =>
+                            a != null &&
+                            typeof a === "object" &&
+                            typeof (a as { trait_type?: string }).trait_type === "string" &&
+                            typeof (a as { value?: string }).value === "string"
+                    );
+                }
+            } catch {
+                // ignore invalid JSON
+            }
+        }
+
         // ──────────────────────────────────────────────
         // Step 2: Build metadata JSON
         // ──────────────────────────────────────────────
@@ -78,7 +98,7 @@ export async function POST(request: NextRequest) {
             name,
             description,
             image: imageUrl,
-            attributes: [],
+            attributes,
             properties: {
                 files: [
                     {
