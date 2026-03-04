@@ -45,6 +45,7 @@ tailwindcss
 - **Recent mints** – Last 10 mints in localStorage with “View tx” links.
 - **Copy** – Copy transaction signature and mint address after minting.
 - **Network** – Badge and explorer links use Devnet or Mainnet from env.
+- **Admin Batch Airdrop** – At `/admin/airdrop`, the wallet set in `NEXT_PUBLIC_ADMIN_WALLET` can upload one event image, set name/description, paste wallet addresses (one per line), and mint an Attendance NFT to each wallet. Optional soulbound (revoke mint/freeze authority). Results table shows per-wallet success/failure and tx links.
 
 ---
 
@@ -56,6 +57,7 @@ tailwindcss
 | `NEXT_PUBLIC_RPC_URL` | No | Solana RPC URL (default: Devnet). |
 | `NEXT_PUBLIC_SOLANA_NETWORK` | No | `devnet` or `mainnet-beta` for explorer links and label. |
 | `NEXT_PUBLIC_PINATA_GATEWAY` | No | IPFS gateway base URL for metadata/image URIs. |
+| `NEXT_PUBLIC_ADMIN_WALLET` | No | Admin wallet public key (base58). Required for `/admin/airdrop`; only this wallet can access the batch airdrop page. |
 
 ---
 
@@ -90,5 +92,9 @@ app/
     MyNFTs.tsx         # Fetch owned NFTs, transfer modal
     RecentMints.tsx    # localStorage recent mints list
   api/upload/route.ts  # POST: image + metadata → Pinata → metadata URI
-  lib/constants.ts     # Recent mints key, image limits, helpers
+  lib/
+    constants.ts       # Recent mints key, image limits, helpers
+    mintToWallet.ts    # mintAttendanceNft helper (airdrop + optional soulbound)
+  admin/airdrop/
+    page.tsx           # Admin-only batch airdrop UI (event form, wallet list, results)
 ```

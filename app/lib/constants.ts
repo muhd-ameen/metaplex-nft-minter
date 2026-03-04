@@ -16,6 +16,9 @@ export const ALLOWED_IMAGE_TYPES = [
 /** Max recent mints to keep */
 export const RECENT_MINTS_LIMIT = 10;
 
+/** Metaplex on-chain metadata name max length (32 chars). Full name can be longer in IPFS JSON. */
+export const METADATA_NAME_MAX_LENGTH = 32;
+
 export type RecentMint = {
   signature: string;
   mintAddress: string;

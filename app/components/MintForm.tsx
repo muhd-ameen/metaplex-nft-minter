@@ -4,7 +4,7 @@ import React, { useState, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useUmi } from "./UmiProvider";
 import { createNft } from "@metaplex-foundation/mpl-token-metadata";
-import { generateSigner } from "@metaplex-foundation/umi";
+import { generateSigner, percentAmount } from "@metaplex-foundation/umi";
 import { base58 } from "@metaplex-foundation/umi/serializers";
 import {
   addRecentMint,
@@ -158,7 +158,7 @@ export default function MintForm() {
         mint,
         name: name.trim(),
         uri: metadataUri,
-        sellerFeeBasisPoints: 0,
+        sellerFeeBasisPoints: percentAmount(0),
       }).sendAndConfirm(umi);
 
       const signature = base58.deserialize(tx.signature)[0];
